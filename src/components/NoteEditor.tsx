@@ -12,7 +12,7 @@ import { User } from '@supabase/supabase-js'
 import { toast } from 'sonner'
 import { Mic, Square, Save, Loader2, MicOff } from 'lucide-react'
 
-// Define Note type here or import from a shared location
+// Define the Note type (can be moved to a shared types file later)
 interface Note {
   id: string;
   user_id: string;
@@ -22,21 +22,19 @@ interface Note {
   updated_at: string;
 }
 
-interface CustomSpeechRecognition extends EventTarget { continuous: boolean; interimResults: boolean; lang: string; start(): void; stop(): void; abort(): void; onresult: ((event: any) => void) | null; onerror: ((event: any) => void) | null; onend: (() => void) | null; }
-const SpeechRecognition = (typeof window !== 'undefined') && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+interface CustomSpeechRecognition extends EventTarget { continuous: boolean; interimResults: boolean; lang: string; start(): void; stop(): void; abort(): void; onresult: ((event: SpeechRecognitionEvent) => void) | null; onerror: ((event: SpeechRecognitionErrorEvent) => void) | null; onend: (() => void) | null; }
+const SpeechRecognition = (typeof window !== 'undefined') && (window.SpeechRecognition || window.webkitSpeechRecognition);
 
-// Updated props for NoteEditor
+// Define props interface
 interface NoteEditorProps {
   user: User;
   note: Note | null; // Allow null for new notes
-  onNoteSaved: (noteId: string) => void; // Callback with saved note ID
   onCancelEdit: () => void;
 }
 
 export default function NoteEditor({
   user,
   note, // Receive note object as prop
-  onNoteSaved,
   onCancelEdit, 
 }: NoteEditorProps) {
   const router = useRouter(); 
@@ -175,6 +173,8 @@ export default function NoteEditor({
                 .eq('id', note.id)
                 .eq('user_id', user.id);
             if (updateError) throw updateError;
+            // Call the callback to signal completion and trigger view switch/refetch in parent
+            onCancelEdit();
             // savedNoteId is already set
         } else {
             // Insert new note
