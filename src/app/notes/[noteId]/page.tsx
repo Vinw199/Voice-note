@@ -87,10 +87,7 @@ export default function EditNotePage() {
       fetchNoteDetails();
   };
 
-  const handleNoteSaved = () => {
-       setIsEditing(false);
-       fetchNoteDetails();
-   };
+ 
 
   if (isLoading) {
     return <NoteEditorSkeleton />;

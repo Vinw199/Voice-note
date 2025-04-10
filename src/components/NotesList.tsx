@@ -43,7 +43,7 @@ const formatDateShort = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, {
       month: 'short', day: 'numeric', year: 'numeric' // Added year for clarity
     });
-  } catch (_) {
+  } catch {
     return '';
   }
 };
