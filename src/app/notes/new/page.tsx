@@ -9,10 +9,6 @@ export default function NewNotePage() {
   const { user } = useNotesContext();
   const router = useRouter();
 
-  const handleNoteSaved = () => {
-      console.log("NewNotePage: Note saved callback triggered (redirect handled by editor).");
-  };
-
   const handleCancelEdit = () => {
       console.log("NewNotePage: Cancel clicked, navigating to /notes");
       router.push('/notes');
@@ -30,7 +26,6 @@ export default function NewNotePage() {
     <NoteEditor 
         user={user} 
         note={null}
-        onNoteSaved={handleNoteSaved} 
         onCancelEdit={handleCancelEdit}
     />
   );
