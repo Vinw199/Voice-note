@@ -6,7 +6,7 @@ import { useDebounce } from 'use-debounce'
 import { Input } from "@/components/ui/input"
 import { Button, buttonVariants } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Trash2, Search, X, FileText, SearchX, Loader2, PlusCircle } from 'lucide-react'
+import { Search, X, Trash2, FileText, PlusCircle } from 'lucide-react'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -97,15 +97,14 @@ export default function NotesList({ user }: NotesListProps) {
         console.log("NotesList: Fetched notes data:", data);
         setNotes(data || []);
       }
-    } catch (err) {
-        console.error("NotesList: Unexpected error fetching notes:", err);
+    } catch (_e) {
+        console.error("NotesList: Unexpected error fetching notes:", _e);
         toast.error("An unexpected error occurred while fetching notes.");
         if (isMounted.current) setNotes([]);
     } finally {
       if (isMounted.current) setLoadingNotes(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]); // fetchNotes depends on user.id but not the debounced term directly
+  }, [user?.id]);
 
   // Effect to fetch notes when debounced search term changes
   useEffect(() => {
@@ -143,8 +142,8 @@ export default function NotesList({ user }: NotesListProps) {
                  fetchNotes(debouncedSearchTerm);
               }
           }
-      } catch (err) {
-          console.error("NotesList: Unexpected error deleting note:", err);
+      } catch (_e) {
+          console.error("NotesList: Unexpected error deleting note:", _e);
           toast.error("An unexpected error occurred while deleting the note.");
       } finally {
           if (isMounted.current) {
@@ -197,7 +196,7 @@ export default function NotesList({ user }: NotesListProps) {
               <div className="text-center py-10 px-4 border border-dashed rounded-lg flex flex-col items-center space-y-3 text-muted-foreground">
                   {debouncedSearchTerm ? (
                       <>
-                          <SearchX className="h-10 w-10" />
+                          <Search className="h-10 w-10" />
                           <h3 className="text-lg font-medium text-foreground/80">
                               No Notes Found
                           </h3>
@@ -253,7 +252,7 @@ export default function NotesList({ user }: NotesListProps) {
                                   <AlertDialogHeader>
                                       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                       <AlertDialogDescription>
-                                          This action cannot be undone. This will permanently delete the note titled "{note.title || 'Untitled Note'}".
+                                          This action cannot be undone. This will permanently delete the note &quot;{note.title}&quot;.
                                       </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
