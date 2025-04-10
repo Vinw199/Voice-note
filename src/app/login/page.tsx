@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('') // Keep for potential non-toast messages if needed
+  // const [message, setMessage] = useState('') // Keep for potential non-toast messages if needed
   const router = useRouter()
   const isMounted = useRef(true); // Use ref to track mounted state
 
@@ -52,7 +52,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setMessage('')
+    // setMessage('')
     setLoading(true)
 
     console.log("Attempting login for:", email);
@@ -66,7 +66,7 @@ export default function LoginPage() {
     if (error) {
       console.error('Login error:', error.message)
       toast.error(error.message || 'Failed to log in. Please check your credentials.') // Use toast for errors
-      setMessage('') // Clear local message state if using toast
+      // setMessage('') // Clear local message state if using toast
     } else if (data?.session) {
       console.log("Login successful, session received.");
       toast.success('Login successful!'); // Use toast for success
@@ -111,7 +111,7 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </Button>
             <Link href="/signup" className="text-sm text-primary hover:underline">
-              Don't have an account? Sign Up
+              Don&apos;t have an account? Sign Up
             </Link>
           </CardFooter>
         </form>

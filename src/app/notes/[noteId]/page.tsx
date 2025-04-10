@@ -63,10 +63,10 @@ export default function EditNotePage() {
          setError("Note not found.");
          router.push('/notes');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("NotePage: Unexpected error fetching note:", err);
-      toast.error(`Error loading note: ${err.message || "Unknown error"}`);
-      setError(err.message || "Failed to load note.");
+      toast.error(`Error loading note: ${err instanceof Error ? err.message : "Unknown error"}`);
+      setError(err instanceof Error ? err.message : "Failed to load note.");
        router.push('/notes');
     } finally {
       setIsLoading(false);

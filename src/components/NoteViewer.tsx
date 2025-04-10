@@ -29,7 +29,7 @@ export default function NoteViewer({ note, onEditClick }: NoteViewerProps) {
               dateStyle: 'medium', 
               timeStyle: 'short'
           });
-      } catch (_e) {
+      } catch (_) {
           return 'Invalid Date';
       }
   }

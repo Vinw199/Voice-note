@@ -28,9 +28,9 @@ const SpeechRecognition = (typeof window !== 'undefined') && ((window as any).Sp
 // Updated props for NoteEditor
 interface NoteEditorProps {
   user: User;
-  note: Note | null; // Pass the full note object (or null for new note)
-  onNoteSaved: () => void; // Callback after successful save/update
-  onCancelEdit: () => void; // Callback to cancel editing
+  note: Note | null; // Allow null for new notes
+  onNoteSaved: (noteId: string) => void; // Callback with saved note ID
+  onCancelEdit: () => void;
 }
 
 export default function NoteEditor({
@@ -84,7 +84,7 @@ export default function NoteEditor({
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
@@ -95,7 +95,7 @@ export default function NoteEditor({
              setNoteContent(prev => prev + (prev.length > 0 && finalTranscript.length > 0 ? ' ' : '') + finalTranscript);
         }
     };
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         let errorMessage = 'Speech recognition error.';
         if (event.error === 'no-speech') errorMessage = 'No speech detected.';
@@ -199,7 +199,7 @@ export default function NoteEditor({
             
             if (note && note.id) {
                 // If updating an existing note, call the callback for parent to handle view switch
-                onNoteSaved(); 
+                onNoteSaved(note.id); 
             } else if (savedNoteId) {
                 // If creating a NEW note, redirect directly to the new note's page
                 router.push(`/notes/${savedNoteId}`);
@@ -208,7 +208,7 @@ export default function NoteEditor({
                 router.push('/notes');
             }
         }
-    } catch (err) {
+    } catch (err: any) {
         console.error("Unexpected error saving note:", err);
         toast.error("An unexpected error occurred.");
     } finally {
