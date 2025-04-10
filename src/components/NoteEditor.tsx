@@ -164,7 +164,6 @@ export default function NoteEditor({
     };
 
     try {
-        let error: any = null;
         let savedNoteId: string | null = note?.id || null; // Use ID from prop if updating
 
         if (note && note.id) { // Check if we are updating (note object exists)
@@ -175,7 +174,7 @@ export default function NoteEditor({
                 .update({ ...noteData, updated_at: new Date().toISOString() })
                 .eq('id', note.id)
                 .eq('user_id', user.id);
-            error = updateError;
+            if (updateError) throw updateError;
             // savedNoteId is already set
         } else {
             // Insert new note
@@ -185,32 +184,23 @@ export default function NoteEditor({
                 .insert(noteData)
                 .select('id')
                 .single();
-            error = insertError;
+            if (insertError) throw insertError;
             savedNoteId = insertData?.id ?? null;
         }
 
         if (!isMounted.current) return;
 
-        if (error) {
-            console.error("Error saving/updating note:", error);
-            toast.error(`Error saving note: ${error.message}`);
+        if (savedNoteId) {
+            // If creating a NEW note, redirect directly to the new note's page
+            router.push(`/notes/${savedNoteId}`);
         } else {
-            toast.success(`Note ${note ? 'updated' : 'saved'} successfully!`);
-            
-            if (note && note.id) {
-                // If updating an existing note, call the callback for parent to handle view switch
-                onNoteSaved(note.id); 
-            } else if (savedNoteId) {
-                // If creating a NEW note, redirect directly to the new note's page
-                router.push(`/notes/${savedNoteId}`);
-            } else {
-                // Fallback if somehow a new note was saved but ID wasn't returned
-                router.push('/notes');
-            }
+            // Fallback if somehow a new note was saved but ID wasn't returned
+            router.push('/notes');
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("Unexpected error saving note:", err);
-        toast.error("An unexpected error occurred.");
+        const message = err instanceof Error ? err.message : "An unexpected error occurred.";
+        toast.error(message);
     } finally {
         if (isMounted.current) setIsSaving(false);
     }

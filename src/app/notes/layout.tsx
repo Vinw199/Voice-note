@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation'
 import LogoutButton from '@/components/LogoutButton'
 import NotesSidebar from '@/components/NotesSidebar'
 import { supabase } from '@/lib/supabaseClient'
-import { User } from '@supabase/supabase-js'
+import { User, Subscription } from '@supabase/supabase-js'
 import { NotesProvider } from '@/context/NotesContext'
 import { Button } from '@/components/ui/button'
 import { Menu, X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from "@/components/mode-toggle"
+import { toast } from 'sonner'
 
 // Inner layout component
 function NotesLayoutContent({ children, user }: { children: React.ReactNode, user: User }) {
@@ -90,26 +91,34 @@ export default function NotesLayoutWrapper({ children }: { children: React.React
 
   useEffect(() => {
     isMounted.current = true;
-    let authListenerSubscription: any = null;
+    let authListenerSubscription: Subscription | null = null;
     const checkUserSession = async () => {
       setLoadingUser(true);
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (!isMounted.current) return;
-      
-      if (sessionError) {
-          console.error("NotesLayout: Error getting session:", sessionError);
-          setUser(null);
-          router.push('/login');
-      } else if (!session) {
-          console.log("NotesLayout: No active session found, redirecting to login.");
-          setUser(null);
-          router.push('/login');
-      } else {
-          console.log("NotesLayout: Session found, setting user.");
-          setUser(session.user);
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (!isMounted.current) return;
+        
+        if (sessionError) {
+            console.error("NotesLayout: Error getting session:", sessionError);
+            setUser(null);
+            router.push('/login');
+        } else if (!session) {
+            console.log("NotesLayout: No active session found, redirecting to login.");
+            setUser(null);
+            router.push('/login');
+        } else {
+            console.log("NotesLayout: Session found, setting user.");
+            setUser(session.user);
+        }
+      } catch (error: unknown) {
+        console.error('Error fetching user session:', error);
+        // Check if it's an Error instance before accessing .message
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        toast.error(`Error loading session: ${errorMessage}`);
+      } finally {
+        setLoadingUser(false);
       }
-      setLoadingUser(false);
     };
     checkUserSession();
 
